@@ -618,31 +618,46 @@ for (let i = 1; i <= 211; i++) {
     const curtainHero = document.getElementById('curtain-hero');
     const mainContent = document.getElementById('mainContent');
     
-    function updateProgress() {
-        const percent = Math.floor((loadedCount / totalAssets) * 100);
-        if (progressBar) {
-            progressBar.style.width = percent + '%';
-        }
-        if (percentText) {
-            percentText.textContent = percent + '%';
-        }
-        
-        // When all assets loaded, fade out preloader and show content
-        if (loadedCount === totalAssets) {
-            setTimeout(() => {
-                if (preloader) {
-                    preloader.classList.add('fade-out');
-                    setTimeout(() => {
-                        preloader.style.display = 'none';
-                        // Show curtain hero and main content
-                        curtainHero.classList.add('visible');
-                        mainContent.classList.add('visible');
-                        document.body.style.overflow = 'hidden'; // Keep hidden until curtain opens
-                    }, 800);
-                }
-            }, 300);
-        }
+    
+let fakeProgress = 0;
+
+function updateProgress() {
+    // REAL progress (background)
+    const realPercent = Math.floor((loadedCount / totalAssets) * 100);
+
+    // FAKE smooth jumps
+    if (fakeProgress < 30) {
+        fakeProgress += 2;
+    } else if (fakeProgress < 60) {
+        fakeProgress += 1;
+    } else if (fakeProgress < 85) {
+        fakeProgress += 0.5;
+    } else if (realPercent >= 100) {
+        fakeProgress = 100;
     }
+
+    if (progressBar) {
+        progressBar.style.width = fakeProgress + '%';
+    }
+
+    if (percentText) {
+        percentText.textContent = Math.floor(fakeProgress) + '%';
+    }
+
+    // FINAL LOAD COMPLETE
+    if (realPercent === 100 && fakeProgress >= 99) {
+        setTimeout(() => {
+            preloader.classList.add('fade-out');
+
+            setTimeout(() => {
+                preloader.style.display = 'none';
+                curtainHero.classList.add('visible');
+                mainContent.classList.add('visible');
+                document.body.style.overflow = 'hidden';
+            }, 800);
+        }, 300);
+    }
+}
     
 
 
@@ -766,7 +781,7 @@ setTimeout(() => {
         top: window.innerHeight,
         behavior: "smooth"
     });
-}, 300);
+}, 600);
 
             
             // Trigger fade animations after curtain opens
