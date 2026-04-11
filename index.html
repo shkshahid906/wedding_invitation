@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
     
-    <!-- Preload critical assets -->
+    <!-- Preload critical assets for faster loading -->
     <link rel="preload" as="image" href="curtain/base_bg_img.png">
     <link rel="preload" as="image" href="curtain/ezgif-frame-001.png">
     <link rel="preload" as="image" href="scratch1.jpg">
@@ -18,6 +18,10 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
     <style>
+        /* ==============================
+           Wedding Invitation Theme
+           ============================== */
+
         :root{
             --gold: #b8860b;
             --gold-light: #d4a84b;
@@ -40,6 +44,7 @@
             background: var(--cream);
             color: var(--brown);
             line-height: 1.7;
+            overflow: hidden;
         }
         
         html, body {
@@ -48,7 +53,9 @@
             padding: 0;
         }
 
-        /* PRELOADER STYLES */
+        /* ==============================
+           PRELOADER STYLES
+           ============================== */
         #preloader {
             position: fixed;
             top: 0;
@@ -153,13 +160,13 @@
             opacity: 0.7;
         }
 
-        /* Hero Section */
+        /* hero section */
         #curtain-hero {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
-            height: 100vh;
+            height: 100dvh;
             background: #ffffff;
             display: flex;
             justify-content: center;
@@ -168,19 +175,12 @@
             z-index: 9999;
             opacity: 0;
             visibility: hidden;
-            transition: opacity 0.5s ease, visibility 0.5s ease;
+            transition: opacity 0.5s ease;
         }
         
         #curtain-hero.visible {
             opacity: 1;
             visibility: visible;
-        }
-        
-        /* Hide hero after animation */
-        #curtain-hero.hide-hero {
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.8s ease, visibility 0.8s ease;
         }
 
         #hero-bg {
@@ -190,7 +190,6 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            object-position: center;
             z-index: 1;
         }
 
@@ -208,11 +207,6 @@
             white-space: nowrap;
         }
 
-        #hero-text.show {
-            opacity: 1;
-            transform: translate(-50%, -50%) scale(1);
-        }
-
         #curtain-img {
             position: absolute;
             top: 0;
@@ -220,7 +214,6 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            object-position: center;
             z-index: 3;
         }
 
@@ -247,59 +240,17 @@
             transform: translateX(-50%) scale(1.02);
         }
 
-        /* Main Content */
+        /* Main Content - initially hidden */
         .main-content {
-            position: relative;
-            z-index: 1;
-            background: var(--cream);
-            min-height: 100vh;
-        }
-
-        /* Simple Scroll Hint */
-        .scroll-hint {
-            position: fixed;
-            bottom: 25px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 100;
-            text-align: center;
-            cursor: pointer;
             opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.5s ease, visibility 0.5s ease;
+            transition: opacity 0.8s ease;
         }
         
-        .scroll-hint.show {
+        .main-content.visible {
             opacity: 1;
-            visibility: visible;
-        }
-        
-        .scroll-hint-inner {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 5px;
-        }
-        
-        .scroll-hint-inner i {
-            font-size: 24px;
-            color: #b8860b;
-            animation: simpleBounce 1.5s ease-in-out infinite;
-        }
-        
-        .scroll-hint-inner span {
-            font-size: 12px;
-            color: #b8860b;
-            letter-spacing: 1px;
-            font-family: var(--font-body);
-        }
-        
-        @keyframes simpleBounce {
-            0%, 100% { transform: translateY(0); opacity: 0.6; }
-            50% { transform: translateY(6px); opacity: 1; }
         }
 
-        /* Scratch Section */
+        /* scratch section */
         .scratch {
             position: absolute;
             top: 0;
@@ -525,7 +476,6 @@
             .names { font-size: 38px; }
             section { padding: 60px 15px; }
             #hero-text { font-size: 24px; white-space: normal; width: 80%; text-align: center; }
-            .map-container iframe { height: 300px; }
         }
     </style>
 </head>
@@ -548,14 +498,6 @@
     </div>
 </div>
 
-<!-- SIMPLE SCROLL HINT -->
-<div id="scrollHint" class="scroll-hint">
-    <div class="scroll-hint-inner">
-        <i class="bi bi-chevron-double-down"></i>
-        <span>SCROLL</span>
-    </div>
-</div>
-
 <!-- CURTAIN HERO -->
 <div id="curtain-hero">
     <img id="hero-bg" src="curtain/base_bg_img.png" alt="Background" />
@@ -566,7 +508,7 @@
 
 <!-- MAIN CONTENT -->
 <div class="main-content" id="mainContent">
-    <section class="fade" id="firstSection">
+    <section class="fade">
         <div class="container">
             <p style="color: #bb772e; font-size: 25px; font-weight: 600;">IN THE NAME OF ALLAH</p>
             <p class="subtitle" style="font-size: 19px; font-weight: 500;">The Most Gracious, The Most Merciful</p>
@@ -647,8 +589,9 @@
 </div>
 
 <script>
-// ==================== ASSET LOADER ====================
+// ==================== ASSET LOADER WITH PROGRESS ====================
 (function() {
+    // List of all critical images to load
     const criticalImages = [
         'curtain/base_bg_img.png',
         'curtain/ezgif-frame-001.png',
@@ -656,10 +599,12 @@
         'hall.jpg'
     ];
     
+    // Preload curtain frames for smooth animation (load every 10th frame initially)
     const curtainFrames = [];
     for (let i = 1; i <= 211; i += 10) {
         curtainFrames.push(`curtain/ezgif-frame-${String(i).padStart(3, '0')}.png`);
     }
+    // Add last frame
     curtainFrames.push('curtain/ezgif-frame-211.png');
     
     const allAssets = [...criticalImages, ...curtainFrames];
@@ -669,19 +614,28 @@
     const percentText = document.getElementById('percentText');
     const preloader = document.getElementById('preloader');
     const curtainHero = document.getElementById('curtain-hero');
+    const mainContent = document.getElementById('mainContent');
     
     function updateProgress() {
         const percent = Math.floor((loadedCount / totalAssets) * 100);
-        if (progressBar) progressBar.style.width = percent + '%';
-        if (percentText) percentText.textContent = percent + '%';
+        if (progressBar) {
+            progressBar.style.width = percent + '%';
+        }
+        if (percentText) {
+            percentText.textContent = percent + '%';
+        }
         
+        // When all assets loaded, fade out preloader and show content
         if (loadedCount >= totalAssets) {
             setTimeout(() => {
                 if (preloader) {
                     preloader.classList.add('fade-out');
                     setTimeout(() => {
                         preloader.style.display = 'none';
+                        // Show curtain hero and main content
                         curtainHero.classList.add('visible');
+                        mainContent.classList.add('visible');
+                        document.body.style.overflow = 'hidden'; // Keep hidden until curtain opens
                     }, 800);
                 }
             }, 300);
@@ -691,26 +645,33 @@
     function loadImage(url) {
         return new Promise((resolve) => {
             const img = new Image();
-            img.onload = () => { loadedCount++; updateProgress(); resolve(); };
-            img.onerror = () => { loadedCount++; updateProgress(); resolve(); };
+            img.onload = () => {
+                loadedCount++;
+                updateProgress();
+                resolve();
+            };
+            img.onerror = () => {
+                loadedCount++;
+                updateProgress();
+                resolve();
+            };
             img.src = url;
         });
     }
     
+    // Load all assets
     async function loadAllAssets() {
         const loadPromises = allAssets.map(url => loadImage(url));
         await Promise.all(loadPromises);
     }
     
+    // Start loading
     loadAllAssets();
 })();
 
 // ==================== CURTAIN ANIMATION ====================
 const btn = document.getElementById("openBtn");
 const curtainImg = document.getElementById("curtain-img");
-const curtainHero = document.getElementById("curtain-hero");
-const scrollHint = document.getElementById("scrollHint");
-const mainContent = document.getElementById("mainContent");
 
 let currentFrame = 1;
 const totalFrames = 211;
@@ -720,6 +681,7 @@ function getFrameUrl(frameNum) {
     return `curtain/ezgif-frame-${String(frameNum).padStart(3, '0')}.png`;
 }
 
+// Preload critical frames for smooth animation
 function preloadCriticalFrames() {
     const criticalFrames = [1, 5, 10, 20, 30, 40, 50, 60, 80, 100, 120, 140, 160, 180, 200, 211];
     criticalFrames.forEach(f => {
@@ -738,16 +700,27 @@ btn.addEventListener("click", () => {
     let lastFrameTime = 0;
     
     function animateCurtain(timestamp) {
-        if (!lastFrameTime) lastFrameTime = timestamp;
+        if (!lastFrameTime) {
+            lastFrameTime = timestamp;
+        }
         
         const elapsed = timestamp - lastFrameTime;
         
         if (elapsed >= frameDelay) {
             currentFrame += 2;
-            if (currentFrame > totalFrames) currentFrame = totalFrames;
+            if (currentFrame > totalFrames) {
+                currentFrame = totalFrames;
+            }
             
-            curtainImg.src = getFrameUrl(currentFrame);
+            if (currentFrame > 30 && !textShown) {
+                document.getElementById("hero-text").classList.add("show");
+                textShown = true;
+            }
             
+            const frameUrl = getFrameUrl(currentFrame);
+            curtainImg.src = frameUrl;
+            
+            // Preload next frames in background
             const nextFrame = currentFrame + 4;
             if (nextFrame <= totalFrames && !frameCache[nextFrame]) {
                 const preloadImg = new Image();
@@ -761,23 +734,15 @@ btn.addEventListener("click", () => {
         if (currentFrame < totalFrames) {
             requestAnimationFrame(animateCurtain);
         } else {
-            // Animation complete - hide hero and show content
-            curtainHero.classList.add("hide-hero");
+            // Animation complete
+            curtainImg.src = getFrameUrl(totalFrames);
+            const hero = document.getElementById("curtain-hero");
+            hero.style.position = "relative";
+            hero.style.height = "100vh";
+            hero.style.zIndex = "1";
+            document.body.style.overflow = "auto";
             
-            // Show main content
-            mainContent.style.opacity = "1";
-            
-            // Show scroll hint
-            setTimeout(() => {
-                scrollHint.classList.add("show");
-                setTimeout(() => {
-                    if (scrollHint.classList.contains("show")) {
-                        scrollHint.classList.remove("show");
-                    }
-                }, 6000);
-            }, 500);
-            
-            // Trigger fade animations for content
+            // Trigger fade animations after curtain opens
             setTimeout(() => {
                 const observer = new IntersectionObserver(entries => {
                     entries.forEach(entry => {
@@ -795,22 +760,7 @@ btn.addEventListener("click", () => {
     requestAnimationFrame(animateCurtain);
 });
 
-// ==================== SCROLL HINT ====================
-scrollHint.addEventListener("click", () => {
-    const firstSection = document.getElementById("firstSection");
-    if (firstSection) {
-        firstSection.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-    scrollHint.classList.remove("show");
-});
-
-window.addEventListener("scroll", () => {
-    if (scrollHint.classList.contains("show")) {
-        scrollHint.classList.remove("show");
-    }
-});
-
-// ==================== COUNTDOWN ====================
+// ==================== COUNTDOWN TIMER ====================
 const weddingDate = new Date("April 16, 2026 12:00:00").getTime();
 setInterval(function(){
     const now = new Date().getTime();
@@ -828,7 +778,7 @@ setInterval(function(){
     document.getElementById("seconds").innerHTML = Math.floor((distance % (1000*60)) / 1000);
 }, 1000);
 
-// ==================== CONFETTI ====================
+// ==================== CONFETTI LAZY LOAD ====================
 function loadConfettiAndCelebrate() {
     if(typeof confetti === 'undefined') {
         const script = document.createElement('script');
@@ -840,7 +790,7 @@ function loadConfettiAndCelebrate() {
     }
 }
 
-// ==================== SCRATCH ====================
+// ==================== OPTIMIZED SCRATCH ====================
 function initScratch(){
     const canvases = document.querySelectorAll(".scratch");
     let completed = 0;
@@ -938,14 +888,16 @@ function celebrate(){
     })();
 }
 
-// Initialize
+// Initialize scratch when DOM ready
 if(document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initScratch);
 } else {
     initScratch();
 }
 
-// Set initial opacity
+// Hide main content and curtain initially until loader finishes
+curtainHero.style.opacity = "0";
+curtainHero.style.visibility = "hidden";
 mainContent.style.opacity = "0";
 </script>
 </body>
